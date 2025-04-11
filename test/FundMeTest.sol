@@ -3,17 +3,19 @@ pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
 import {FundMe} from "../src/FundMe.sol";
-contract FundMeTest is Test {
+import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 
+contract FundMeTest is Test {
     uint256 favNumber = 0;
     bool greatCourse = false;
     FundMe fundMe;
 
-    function setUp() external { 
-        fundMe = new FundMe();
+    function setUp() external {
+    DeployFundMe deployFundMe = new DeployFundMe();
+    fundMe = deployFundMe.run();
     }
 
-    // function testDemo() public { 
+    // function testDemo() public {
     //     assertEq(favNumber, 1337);
     //     assertEq(greatCourse, true);
     //     console.log("This will get printed second!");
@@ -22,9 +24,11 @@ contract FundMeTest is Test {
     // }
 
     function testOwnerIsMsgSender() public {
-        assertEq(fundMe.i_owner(), address(this));
-
+        assertEq(fundMe.i_owner(), msg.sender);
     }
 
-
- }
+    function testPriceFeedVersionIsAccurate() public {
+        uint256 version = fundMe.getVersion();
+        assertEq(version, 4);
+    }
+}
